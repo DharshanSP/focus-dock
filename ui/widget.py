@@ -200,12 +200,19 @@ class DeskReminderWidget(QWidget):
         settings_btn.setToolTip("Open Settings")
         settings_btn.clicked.connect(self.open_settings_dialog)
 
+        close_btn = QPushButton()
+        close_btn.setFixedSize(14, 14)
+        close_btn.setStyleSheet("background-color: #e53935; border: none; border-radius: 7px;")
+        close_btn.setToolTip("Exit Application")
+        close_btn.clicked.connect(self.exit_app)
+
         header_layout.addWidget(self.help_btn)
         header_layout.addWidget(self.title_lbl)
         header_layout.addStretch()
         header_layout.addWidget(self.pin_btn)
         header_layout.addWidget(collapse_btn)
         header_layout.addWidget(settings_btn)
+        header_layout.addWidget(close_btn)
         self.expanded_layout.addLayout(header_layout)
 
         # Stats / Dashboard (Inline)
@@ -445,6 +452,7 @@ class DeskReminderWidget(QWidget):
             "<li><span style='color:#00bcd4;'>● Cyan</span>: Toggle Always on Top (Pin)</li>"
             "<li><span style='color:#ff9800;'>● Orange</span>: Minimize window</li>"
             "<li><span style='color:#9c27b0;'>● Purple</span>: Settings dialog</li>"
+            "<li><span style='color:#e53935;'>● Dark Red</span>: Exit / Close app</li>"
             "<li><span style='color:#4caf50;'>● Green</span>: Edit reminder</li>"
             "<li><span style='color:#f44336;'>● Red</span>: Delete reminder</li>"
             "</ul>"
