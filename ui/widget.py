@@ -78,15 +78,15 @@ class ReminderCard(QFrame):
         layout.addLayout(info_layout, 1)
 
         # Edit and Delete buttons
-        self.edit_btn = QPushButton("EDIT")
-        self.edit_btn.setFont(QFont("Segoe UI", 7, QFont.Weight.Bold))
-        self.edit_btn.setFixedSize(34, 18)
+        self.edit_btn = QPushButton()
+        self.edit_btn.setFixedSize(14, 14)
+        self.edit_btn.setStyleSheet("background-color: #4caf50; border: none; border-radius: 7px;")
         self.edit_btn.setToolTip("Edit Reminder")
         self.edit_btn.clicked.connect(lambda: self.on_edit(self.reminder))
         
-        self.delete_btn = QPushButton("DEL")
-        self.delete_btn.setFont(QFont("Segoe UI", 7, QFont.Weight.Bold))
-        self.delete_btn.setFixedSize(30, 18)
+        self.delete_btn = QPushButton()
+        self.delete_btn.setFixedSize(14, 14)
+        self.delete_btn.setStyleSheet("background-color: #f44336; border: none; border-radius: 7px;")
         self.delete_btn.setToolTip("Delete Reminder")
         self.delete_btn.clicked.connect(lambda: self.on_delete(self.reminder.id))
 
@@ -115,6 +115,8 @@ class DeskReminderWidget(QWidget):
         self.open_stickies = {}  # reminder_id -> StickyNoteWindow
         
         self.init_ui()
+        self.setMouseTracking(True)
+        self.frame.setMouseTracking(True)
         self.apply_theme()
         self.refresh_reminder_list()
         self.restore_window_position()
@@ -180,19 +182,22 @@ class DeskReminderWidget(QWidget):
         self.title_lbl = QLabel("DeskReminder")
         self.title_lbl.setObjectName("title")
         
-        self.pin_btn = QPushButton("UNPIN" if self.always_on_top else "PIN")
-        self.pin_btn.setFont(QFont("Segoe UI", 7, QFont.Weight.Bold))
-        self.pin_btn.setFixedSize(45, 20)
+        self.pin_btn = QPushButton()
+        self.pin_btn.setFixedSize(14, 14)
+        self.pin_btn.setStyleSheet("background-color: #00bcd4; border: none; border-radius: 7px;")
+        self.pin_btn.setToolTip("Toggle Always on Top")
         self.pin_btn.clicked.connect(self.toggle_always_on_top)
         
-        collapse_btn = QPushButton("MIN")
-        collapse_btn.setFont(QFont("Segoe UI", 7, QFont.Weight.Bold))
-        collapse_btn.setFixedSize(32, 20)
+        collapse_btn = QPushButton()
+        collapse_btn.setFixedSize(14, 14)
+        collapse_btn.setStyleSheet("background-color: #ff9800; border: none; border-radius: 7px;")
+        collapse_btn.setToolTip("Minimize Widget")
         collapse_btn.clicked.connect(self.collapse_widget)
 
-        settings_btn = QPushButton("SET")
-        settings_btn.setFont(QFont("Segoe UI", 7, QFont.Weight.Bold))
-        settings_btn.setFixedSize(30, 20)
+        settings_btn = QPushButton()
+        settings_btn.setFixedSize(14, 14)
+        settings_btn.setStyleSheet("background-color: #9c27b0; border: none; border-radius: 7px;")
+        settings_btn.setToolTip("Open Settings")
         settings_btn.clicked.connect(self.open_settings_dialog)
 
         header_layout.addWidget(self.help_btn)
@@ -290,7 +295,7 @@ class DeskReminderWidget(QWidget):
 
     def toggle_always_on_top(self):
         self.always_on_top = not self.always_on_top
-        self.pin_btn.setText("UNPIN" if self.always_on_top else "PIN")
+        # Text label removed to keep colors-only minimal interface
         
         # Reset window flags
         pos = self.pos()
@@ -435,13 +440,13 @@ class DeskReminderWidget(QWidget):
         from PyQt6.QtWidgets import QMessageBox
         guide_text = (
             "<h3>DeskReminder Guide</h3>"
-            "<p><b>Buttons Guide:</b></p>"
+            "<p><b>Color-Coded Buttons:</b></p>"
             "<ul>"
-            "<li><b>PIN / UNPIN</b>: Stays on top</li>"
-            "<li><b>MIN</b>: Collapse to float bubble</li>"
-            "<li><b>SET</b>: Theme & app settings</li>"
-            "<li><b>EDIT</b>: Edit item</li>"
-            "<li><b>DEL</b>: Remove item</li>"
+            "<li><span style='color:#00bcd4;'>● Cyan</span>: Toggle Always on Top (Pin)</li>"
+            "<li><span style='color:#ff9800;'>● Orange</span>: Minimize window</li>"
+            "<li><span style='color:#9c27b0;'>● Purple</span>: Settings dialog</li>"
+            "<li><span style='color:#4caf50;'>● Green</span>: Edit reminder</li>"
+            "<li><span style='color:#f44336;'>● Red</span>: Delete reminder</li>"
             "</ul>"
             "<p><b>Keyboard Shortcuts:</b></p>"
             "<ul>"
@@ -449,6 +454,7 @@ class DeskReminderWidget(QWidget):
             "<li><b>Ctrl + F</b>: Search Bar</li>"
             "<li><b>Ctrl + D</b>: Cycle Themes</li>"
             "</ul>"
+            "<p><b>Resizing:</b> Drag borders or bottom-right corner to resize window.</p>"
         )
         QMessageBox.information(self, "DeskReminder User Guide", guide_text)
 
@@ -495,16 +501,59 @@ class DeskReminderWidget(QWidget):
         event.ignore()
         self.hide()
 
-    # Dragging logic
+    # Dragging & Resizing logic
     def mousePressEvent(self, event):
         if event.button() == Qt.MouseButton.LeftButton:
-            self.drag_position = event.globalPosition().toPoint() - self.frameGeometry().topLeft()
+            pos = event.position()
+            self.resize_direction = None
+            margin = 12
+            rect = self.rect()
+            
+            if pos.x() >= rect.width() - margin and pos.y() >= rect.height() - margin:
+                self.resize_direction = "both"
+            elif pos.x() >= rect.width() - margin:
+                self.resize_direction = "horizontal"
+            elif pos.y() >= rect.height() - margin:
+                self.resize_direction = "vertical"
+            else:
+                self.drag_position = event.globalPosition().toPoint() - self.frameGeometry().topLeft()
             event.accept()
 
     def mouseMoveEvent(self, event):
+        if event.buttons() == Qt.MouseButton.NoButton:
+            pos = event.position()
+            margin = 12
+            rect = self.rect()
+            if pos.x() >= rect.width() - margin and pos.y() >= rect.height() - margin:
+                self.setCursor(Qt.CursorShape.SizeFDiagCursor)
+            elif pos.x() >= rect.width() - margin:
+                self.setCursor(Qt.CursorShape.SizeHorCursor)
+            elif pos.y() >= rect.height() - margin:
+                self.setCursor(Qt.CursorShape.SizeVerCursor)
+            else:
+                self.setCursor(Qt.CursorShape.ArrowCursor)
+            return
+
         if event.buttons() == Qt.MouseButton.LeftButton:
-            self.move(event.globalPosition().toPoint() - self.drag_position)
-            # Persist positions
-            self.settings_repo.set("window_x", str(self.x()))
-            self.settings_repo.set("window_y", str(self.y()))
+            if hasattr(self, 'resize_direction') and self.resize_direction:
+                delta_x = event.globalPosition().toPoint().x() - self.x()
+                delta_y = event.globalPosition().toPoint().y() - self.y()
+                new_w = max(300, delta_x)
+                new_h = max(200, delta_y)
+                
+                if self.resize_direction == "horizontal":
+                    self.resize(new_w, self.height())
+                elif self.resize_direction == "vertical":
+                    self.resize(self.width(), new_h)
+                elif self.resize_direction == "both":
+                    self.resize(new_w, new_h)
+            else:
+                self.move(event.globalPosition().toPoint() - self.drag_position)
+                self.settings_repo.set("window_x", str(self.x()))
+                self.settings_repo.set("window_y", str(self.y()))
             event.accept()
+
+    def mouseReleaseEvent(self, event):
+        self.resize_direction = None
+        self.setCursor(Qt.CursorShape.ArrowCursor)
+        event.accept()
