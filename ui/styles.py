@@ -184,7 +184,7 @@ QWidget {
     font-size: 13px;
 }
 QFrame#mainWidget {
-    background-color: rgba(30, 30, 30, 0.7);
+    background-color: rgb(30, 30, 30);
     border: 1px solid rgba(255, 255, 255, 0.15);
     border-radius: 12px;
 }
