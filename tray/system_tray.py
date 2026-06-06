@@ -1,6 +1,6 @@
 from PyQt6.QtWidgets import QSystemTrayIcon, QMenu
 from PyQt6.QtGui import QIcon, QAction
-from PyQt6.QtCore import QObject
+from PyQt6.QtCore import QObject, Qt
 
 class DeskReminderSystemTray(QSystemTrayIcon):
     def __init__(self, main_window, parent=None):
