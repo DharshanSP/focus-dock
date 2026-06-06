@@ -169,6 +169,14 @@ class DeskReminderWidget(QWidget):
 
         # Header Section
         header_layout = QHBoxLayout()
+        header_layout.setSpacing(6)
+        
+        self.help_btn = QPushButton("?")
+        self.help_btn.setFixedSize(20, 20)
+        self.help_btn.setFont(QFont("Segoe UI", 9, QFont.Weight.Bold))
+        self.help_btn.setToolTip("User Guide & Shortcuts")
+        self.help_btn.clicked.connect(self.show_user_guide)
+        
         self.title_lbl = QLabel("DeskReminder")
         self.title_lbl.setObjectName("title")
         
@@ -187,6 +195,7 @@ class DeskReminderWidget(QWidget):
         settings_btn.setFixedSize(30, 20)
         settings_btn.clicked.connect(self.open_settings_dialog)
 
+        header_layout.addWidget(self.help_btn)
         header_layout.addWidget(self.title_lbl)
         header_layout.addStretch()
         header_layout.addWidget(self.pin_btn)
@@ -421,6 +430,27 @@ class DeskReminderWidget(QWidget):
         if dialog.exec():
             self.apply_theme()
             self.refresh_reminder_list()
+
+    def show_user_guide(self):
+        from PyQt6.QtWidgets import QMessageBox
+        guide_text = (
+            "<h3>DeskReminder Guide</h3>"
+            "<p><b>Buttons Guide:</b></p>"
+            "<ul>"
+            "<li><b>PIN / UNPIN</b>: Stays on top</li>"
+            "<li><b>MIN</b>: Collapse to float bubble</li>"
+            "<li><b>SET</b>: Theme & app settings</li>"
+            "<li><b>EDIT</b>: Edit item</li>"
+            "<li><b>DEL</b>: Remove item</li>"
+            "</ul>"
+            "<p><b>Keyboard Shortcuts:</b></p>"
+            "<ul>"
+            "<li><b>Ctrl + N</b>: New Reminder</li>"
+            "<li><b>Ctrl + F</b>: Search Bar</li>"
+            "<li><b>Ctrl + D</b>: Cycle Themes</li>"
+            "</ul>"
+        )
+        QMessageBox.information(self, "DeskReminder User Guide", guide_text)
 
     # Sticky Note triggers
     def launch_sticky_note(self, reminder: Reminder):
