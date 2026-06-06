@@ -78,13 +78,15 @@ class ReminderCard(QFrame):
         layout.addLayout(info_layout, 1)
 
         # Edit and Delete buttons
-        self.edit_btn = QPushButton("✏️")
-        self.edit_btn.setFixedSize(24, 24)
+        self.edit_btn = QPushButton("EDIT")
+        self.edit_btn.setFont(QFont("Segoe UI", 7, QFont.Weight.Bold))
+        self.edit_btn.setFixedSize(34, 18)
         self.edit_btn.setToolTip("Edit Reminder")
         self.edit_btn.clicked.connect(lambda: self.on_edit(self.reminder))
         
-        self.delete_btn = QPushButton("🗑️")
-        self.delete_btn.setFixedSize(24, 24)
+        self.delete_btn = QPushButton("DEL")
+        self.delete_btn.setFont(QFont("Segoe UI", 7, QFont.Weight.Bold))
+        self.delete_btn.setFixedSize(30, 18)
         self.delete_btn.setToolTip("Delete Reminder")
         self.delete_btn.clicked.connect(lambda: self.on_delete(self.reminder.id))
 
@@ -170,16 +172,19 @@ class DeskReminderWidget(QWidget):
         self.title_lbl = QLabel("DeskReminder")
         self.title_lbl.setObjectName("title")
         
-        self.pin_btn = QPushButton("📌" if self.always_on_top else "📍")
-        self.pin_btn.setFixedSize(24, 24)
+        self.pin_btn = QPushButton("UNPIN" if self.always_on_top else "PIN")
+        self.pin_btn.setFont(QFont("Segoe UI", 7, QFont.Weight.Bold))
+        self.pin_btn.setFixedSize(45, 20)
         self.pin_btn.clicked.connect(self.toggle_always_on_top)
         
-        collapse_btn = QPushButton("▲")
-        collapse_btn.setFixedSize(24, 24)
+        collapse_btn = QPushButton("MIN")
+        collapse_btn.setFont(QFont("Segoe UI", 7, QFont.Weight.Bold))
+        collapse_btn.setFixedSize(32, 20)
         collapse_btn.clicked.connect(self.collapse_widget)
 
-        settings_btn = QPushButton("⚙️")
-        settings_btn.setFixedSize(24, 24)
+        settings_btn = QPushButton("SET")
+        settings_btn.setFont(QFont("Segoe UI", 7, QFont.Weight.Bold))
+        settings_btn.setFixedSize(30, 20)
         settings_btn.clicked.connect(self.open_settings_dialog)
 
         header_layout.addWidget(self.title_lbl)
@@ -276,7 +281,7 @@ class DeskReminderWidget(QWidget):
 
     def toggle_always_on_top(self):
         self.always_on_top = not self.always_on_top
-        self.pin_btn.setText("📌" if self.always_on_top else "📍")
+        self.pin_btn.setText("UNPIN" if self.always_on_top else "PIN")
         
         # Reset window flags
         pos = self.pos()
