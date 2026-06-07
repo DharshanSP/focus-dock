@@ -13,6 +13,7 @@ class ReminderScheduler(QThread):
         self.repository = repository
         self.running = True
         self.last_checked_minute = None
+        self.triggered_ids = set()
 
     def run(self):
         """Main loop checking for due reminders every 10 seconds to detect minute boundaries."""
@@ -26,7 +27,14 @@ class ReminderScheduler(QThread):
                 if current_minute != self.last_checked_minute:
                     due_reminders = self.repository.get_pending_active_at(current_date, current_minute)
                     for reminder in due_reminders:
-                        self.reminder_triggered.emit(reminder)
+                        if reminder.id not in self.triggered_ids:
+                            self.reminder_triggered.emit(reminder)
+                            self.triggered_ids.add(reminder.id)
+                    
+                    # Clean up triggered_ids that are no longer pending or no longer due
+                    due_ids = {r.id for r in due_reminders}
+                    self.triggered_ids = self.triggered_ids.intersection(due_ids)
+                    
                     self.last_checked_minute = current_minute
 
             except Exception as e:

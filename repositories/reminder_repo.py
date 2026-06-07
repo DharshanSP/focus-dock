@@ -108,12 +108,12 @@ class ReminderRepository:
         return [Reminder.from_row(row) for row in rows]
 
     def get_pending_active_at(self, current_date: str, current_time: str) -> list[Reminder]:
-        """Gets all non-completed reminders due at a specific minute."""
+        """Gets all non-completed reminders due at or before the specified date and time."""
         conn = get_db_connection()
         cursor = conn.cursor()
         cursor.execute(
-            "SELECT * FROM reminders WHERE due_date = ? AND due_time = ? AND completed = 0",
-            (current_date, current_time)
+            "SELECT * FROM reminders WHERE (due_date < ? OR (due_date = ? AND due_time <= ?)) AND completed = 0",
+            (current_date, current_date, current_time)
         )
         rows = cursor.fetchall()
         conn.close()
