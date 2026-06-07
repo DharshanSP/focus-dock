@@ -114,7 +114,6 @@ class NotificationWindow(QWidget):
 
     def position_bottom_right(self):
         """Positions the window at the bottom right corner of the screen."""
-        screen = Qt.ApplicationAttribute.globalShareWidgets()  # dummy fallback
         from PyQt6.QtWidgets import QApplication
         screen_geometry = QApplication.primaryScreen().availableGeometry()
         x = screen_geometry.width() - self.width() - 20
