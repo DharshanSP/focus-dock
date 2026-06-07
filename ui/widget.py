@@ -97,8 +97,14 @@ class ReminderCard(QFrame):
         self.service.toggle_reminder_status(self.reminder.id)
         # Re-fetch state
         self.reminder = self.service.repository.get_by_id(self.reminder.id)
-        # Redraw
-        self.init_ui()
+        # Inform parent widget to refresh list (makes completed items disappear from "All" or active pending views)
+        if self.parent() and hasattr(self.parent(), 'refresh_reminder_list'):
+            self.parent().refresh_reminder_list()
+        elif self.parent() and self.parent().parent() and hasattr(self.parent().parent(), 'refresh_reminder_list'):
+            # Sometimes nested in scroll content
+            self.parent().parent().refresh_reminder_list()
+        else:
+            self.init_ui()
 
 
 class DeskReminderWidget(QWidget):

@@ -43,7 +43,9 @@ class ReminderRepository:
             params.extend([f"%{search}%", f"%{search}%"])
 
         # Filters
-        if filter_by == "Today":
+        if filter_by == "All":
+            query += " AND completed = 0"
+        elif filter_by == "Today":
             query += " AND due_date = date('now', 'localtime') AND completed = 0"
         elif filter_by == "Upcoming":
             query += " AND due_date > date('now', 'localtime') AND completed = 0"

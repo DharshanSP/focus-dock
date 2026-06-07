@@ -67,6 +67,11 @@ class DeskReminderApp:
         popup.raise_()
         popup.activateWindow()
         
+        # Show and activate the main app window
+        self.widget.show_and_activate()
+        if not self.widget.is_expanded:
+            self.widget.expand_widget()
+        
         # Refresh the main list UI to reflect any changes if needed
         self.widget.refresh_reminder_list()
 
